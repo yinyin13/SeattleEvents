@@ -2,3 +2,10 @@ psycopg2-binary
 requests
 python-dotenv
 streamlit-folium
+streamlit
+pandas
+altair
+streamlit_folium
+sqlalchemy
+psycopg2
+dotenv
