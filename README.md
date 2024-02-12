@@ -15,7 +15,7 @@ This is a web app built to visualize and explore events happening in Seattle. Th
 2. Navigate to the project directory:
 
     ```bash
-    cd seattle-events-dashboard
+    cd project-directory
     ```
 
 3. Install dependencies:
