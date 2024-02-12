@@ -30,7 +30,7 @@ This is a web app built to visualize and explore events happening in Seattle. Th
     streamlit run app.py
     ```
 
-5. Open your web browser and go to [http://localhost:8501](http://localhost:8501) to access the dashboard.
+To access the web app directly online, go to [Seattle Events](http://yinyin13-events-scraper.azurewebsites.net) to access the dashboard.
 
 ## Lessons Learned
 
