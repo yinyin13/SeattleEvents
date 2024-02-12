@@ -1,1 +1,48 @@
-# techin510_lab5
+# Lab 5: Seattle Events Dashboard
+
+## Overview
+
+This is a web app built to visualize and explore events happening in Seattle. The dashboard provides interactive charts and filtering options to help users discover events based on their preferences.
+
+## How to Run
+
+1. Clone this repository:
+
+    ```bash
+    git clone https://github.com/yinyin13/techin510_lab5.git
+    ```
+
+2. Navigate to the project directory:
+
+    ```bash
+    cd seattle-events-dashboard
+    ```
+
+3. Install dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Run the Streamlit app:
+
+    ```bash
+    streamlit run app.py
+    ```
+
+5. Open your web browser and go to [http://localhost:8501](http://localhost:8501) to access the dashboard.
+
+## Lessons Learned
+
+During the development of this project, I learned to:
+
+- Use data visualization libraries like Altair and Folium.
+- Initialize database and retrieve data using SQL.
+- Handle date filtering and geographical data visualization.
+
+## Questions/Future Improvements
+
+- Improve UI to make it more intuitive and user-friendly.
+- Implement more advanced filtering options, such as filtering by event type or venue.
+- Enhance the performance of data retrieval and processing for large datasets.
+- Add features for users to save and share customized views of the dashboard.
