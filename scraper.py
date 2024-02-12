@@ -25,7 +25,7 @@ def list_links():
     json.dump(links, open(URL_LIST_FILE, 'w'))
 
 def get_weather_data(location_query):
-    location_query = f'{location_query}, WA, USA'
+    location_query = f'{location_query}, Seattle'
     location_url = "https://nominatim.openstreetmap.org/search"
     params = {
         'q': location_query,
@@ -54,11 +54,11 @@ def get_weather_data(location_query):
         # Fetch more detailed forecast data to get min, max temperature, and wind chill
         grid_res = requests.get(detailed_forecast_url)
         grid_data = grid_res.json()
-        min_temperature = grid_data.get('properties', {}).get('temperature', {}).get('values', [{}])[0].get('value', '')
-        max_temperature = grid_data.get('properties', {}).get('temperature', {}).get('values', [{}])[-1].get('value', '')
+        min_temperature = grid_data.get('properties', {}).get('minTemperature', {}).get('values', [{}])[0].get('value', '')
+        max_temperature = grid_data.get('properties', {}).get('maxTemperature', {}).get('values', [{}])[-1].get('value', '')
         wind_chill = grid_data.get('properties', {}).get('windChill', {}).get('values', [{}])[0].get('value', '')
 
-        return short_forecast, min_temperature, max_temperature, wind_chill
+        return short_forecast, min_temperature, max_temperature, wind_chill, latitude, longitude
 
     return None, None, None, None
 
@@ -85,11 +85,13 @@ def get_detail_page():
                 location_query = [f'{location_query}, Seattle']
 
             # Fetch weather data
-            short_forecast, min_temperature, max_temperature, wind_chill = get_weather_data(location_query)
+            short_forecast, min_temperature, max_temperature, wind_chill, latitude, longitude = get_weather_data(location_query)
             row['short_forecast'] = short_forecast
             row['min_temperature'] = min_temperature
             row['max_temperature'] = max_temperature
             row['wind_chill'] = wind_chill
+            row['latitude'] = latitude
+            row['longitude'] = longitude
 
             data.append(row)
         except IndexError as e:
@@ -110,7 +112,9 @@ def insert_to_pg():
         short_forecast TEXT,
         min_temperature TEXT,
         max_temperature TEXT,
-        wind_chill TEXT
+        wind_chill TEXT,
+        latitude TEXT,
+        longitude TEXT
     );
     '''
     conn = get_db_conn()
@@ -121,11 +125,11 @@ def insert_to_pg():
     data = json.load(open(URL_DETAIL_FILE, 'r'))
     for url, row in zip(urls, data):
         q = '''
-        INSERT INTO events (url, title, date, venue, category, location, short_forecast, min_temperature, max_temperature, wind_chill)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO events (url, title, date, venue, category, location, short_forecast, min_temperature, max_temperature, wind_chill, latitude, longitude)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (url) DO NOTHING;
         '''
-        cur.execute(q, (url, row['title'], row['date'], row['venue'], row['category'], row['location'], row['short_forecast'], row['min_temperature'], row['max_temperature'], row['wind_chill']))
+        cur.execute(q, (url, row['title'], row['date'], row['venue'], row['category'], row['location'], row['short_forecast'], row['min_temperature'], row['max_temperature'], row['wind_chill'], row['latitude'], row['longitude']))
 
 if __name__ == '__main__':
     list_links()
