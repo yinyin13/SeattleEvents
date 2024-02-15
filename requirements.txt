@@ -4,3 +4,4 @@ beautifulsoup4
 python-dotenv
 streamlit-folium
 sqlalchemy
+postgres
