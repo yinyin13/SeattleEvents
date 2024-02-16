@@ -66,26 +66,40 @@ def get_weather_data(location_query):
 def get_detail_page():
     links = json.load(open(URL_LIST_FILE, 'r'))
     data = []
+
     for link in links:
         try:
             row = {}
             res = requests.get(link)
-            row['title'] = html.unescape(re.findall(r'<h1 class="page-title" itemprop="headline">(.+?)</h1>', res.text)[0])
-            datetime_venue = re.findall(r'<h4><span>.*?(\d{1,2}/\d{1,2}/\d{4})</span> \| <span>(.+?)</span></h4>', res.text)[0]
-            row['date'] = datetime.datetime.strptime(datetime_venue[0], '%m/%d/%Y').replace(tzinfo=ZoneInfo('America/Los_Angeles')).isoformat()
-            row['venue'] = datetime_venue[1].strip() # remove leading/trailing whitespaces
+
+            titles = re.findall(r'<h1 class="page-title" itemprop="headline">(.+?)</h1>', res.text)
+            row['title'] = html.unescape(titles[0]) if titles else None
+
+            datetime_venue = re.findall(r'<h4><span>.*?(\d{1,2}/\d{1,2}/\d{4})</span> \| <span>(.+?)</span></h4>', res.text)
+            if datetime_venue:
+                row['date'] = datetime.datetime.strptime(datetime_venue[0][0], '%m/%d/%Y').replace(tzinfo=ZoneInfo('America/Los_Angeles')).isoformat()
+                row['venue'] = datetime_venue[0][1].strip() # remove leading/trailing whitespaces
+            else:
+                row['date'] = row['venue'] = None
+
             metas = re.findall(r'<a href=".+?" class="button big medium black category">(.+?)</a>', res.text)
-            row['category'] = html.unescape(metas[0])
-            row['location'] = metas[1]
+            if metas:
+                row['category'] = html.unescape(metas[0])
+                row['location'] = metas[1] if len(metas) > 1 else None
+            else:
+                row['category'] = row['location'] = None
+
+            # print for debug
+            print(f"Title: {row['title']}, Date: {row['date']}, Venue: {row['venue']}, Category: {row['category']}, Location: {row['location']}")
 
             location_query = row['location']
 
-            if '/' in location_query:
+            if location_query and '/' in location_query:
                 location_query = location_query.split(' / ')[0].strip()
                 location_query = [f'{location_query}, Seattle']
 
             # Fetch weather data
-            short_forecast, min_temperature, max_temperature, wind_chill, latitude, longitude = get_weather_data(location_query)
+            short_forecast, min_temperature, max_temperature, wind_chill, latitude, longitude = get_weather_data(location_query) if location_query else (None, None, None, None, None, None)
             row['short_forecast'] = short_forecast
             row['min_temperature'] = min_temperature
             row['max_temperature'] = max_temperature
